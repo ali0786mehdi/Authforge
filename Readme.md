@@ -37,5 +37,5 @@ Ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/yourusername/authforge.git](https://github.com/yourusername/authforge.git)
-   cd authforge
+   git clone [https://github.com/ali0786mehdi/Authforge.git](https://github.com/ali0786mehdi/Authforge.git)
+   cd Authforge
