@@ -1,238 +1,495 @@
 # 🛡️ AuthForge
 
-A production-grade authentication and authorization API built with Node.js, TypeScript, and PostgreSQL.
+> Enterprise-Grade Authentication & Authorization Service built with Node.js, TypeScript, PostgreSQL, Prisma, and Redis.
 
-Designed as a plug-and-play identity provider implementing modern security standards — JWT token rotation, RBAC, OAuth2 social login, TOTP-based 2FA, and Redis-backed session management.
+AuthForge is a production-oriented identity platform designed to handle authentication, authorization, session management, and account security for modern web applications.
 
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-7+-DC382D?style=flat-square&logo=redis&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+Instead of rebuilding authentication logic inside every project, AuthForge acts as a standalone authentication service responsible for user identity, access control, session lifecycle management, and security enforcement.
+
+The project is being developed as a backend engineering portfolio project focused on real-world architecture, security practices, scalability considerations, and production readiness.
 
 ---
 
-## Overview
+## ✨ Goals
 
-AuthForge is a standalone auth service built to be integrated with any frontend or backend system. It handles the entire identity lifecycle — from registration to session revocation — so your main application doesn't have to.
+AuthForge aims to demonstrate:
 
-Built as a real-world portfolio project to demonstrate deep backend engineering: not just "it works" but correct security patterns, clean architecture, and production deployment practices.
-
----
-
-## Features
-
-| Feature | Status |
-|---------|--------|
-| Email/password registration with bcrypt hashing | ✅ Phase 2 |
-| JWT access token + refresh token rotation | ✅ Phase 2 |
-| Redis-backed token blacklisting | ✅ Phase 3 |
-| Role-Based Access Control (RBAC) | ✅ Phase 3 |
-| Rate limiting and brute-force protection | ✅ Phase 3 |
-| Email verification | ✅ Phase 4 |
-| Password reset flow | ✅ Phase 4 |
-| Time-based 2FA (TOTP — Google Authenticator) | ✅ Phase 4 |
-| Google and GitHub OAuth2 login | ✅ Phase 5 |
-| Multi-device session management | ✅ Phase 5 |
-| OpenAPI / Swagger documentation | ✅ Phase 6 |
-| Docker + docker-compose setup | ✅ Phase 6 |
+- Secure authentication architecture
+- JWT access and refresh token lifecycle management
+- Session management using Redis
+- Role-Based Access Control (RBAC)
+- Multi-Factor Authentication (MFA)
+- OAuth2 Social Authentication
+- Secure password recovery flows
+- Production-grade API design
+- Dockerized deployment
+- OpenAPI documentation
+- Scalable backend architecture
 
 ---
 
-## Tech Stack
+# 🏗 System Architecture
+
+```text
+                     ┌──────────────────┐
+                     │  Client Apps     │
+                     │ Web / Mobile     │
+                     └────────┬─────────┘
+                              │
+                              ▼
+
+                 ┌─────────────────────────┐
+                 │      Express API        │
+                 │ Authentication Service  │
+                 └─────────┬───────────────┘
+                           │
+       ┌───────────────────┼───────────────────┐
+       ▼                   ▼                   ▼
+
+┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+│ PostgreSQL   │   │ Redis Cache  │   │ OAuth/Email │
+│ User Data    │   │ Sessions     │   │ Providers   │
+└──────────────┘   └──────────────┘   └──────────────┘
+```
+
+---
+
+# ⚙️ Tech Stack
 
 | Layer | Technology |
-|-------|------------|
-| Runtime | Node.js 18+ |
-| Language | TypeScript 5.x |
+|---------|------------|
+| Runtime | Node.js 20+ |
+| Language | TypeScript |
 | Framework | Express.js |
-| Database | PostgreSQL 16 |
+| Database | PostgreSQL |
 | ORM | Prisma |
-| Cache / Sessions | Redis |
-| Auth tokens | JSON Web Tokens (JWT) |
-| Password hashing | bcrypt |
+| Cache | Redis |
+| Authentication | JWT |
 | Validation | Zod |
-| API docs | Swagger / OpenAPI 3.0 |
-| Containerization | Docker + docker-compose |
+| Password Hashing | bcrypt |
+| API Documentation | Swagger/OpenAPI |
+| Containerization | Docker |
+| Background Jobs | BullMQ *(planned)* |
+| Logging | Pino *(planned)* |
 
 ---
 
-## Project Structure
+# 📂 Project Structure
 
-```
+```text
 authforge/
+
 ├── prisma/
-│   ├── migrations/          # Auto-generated migration history
-│   └── schema.prisma        # Database schema
+│   ├── migrations/
+│   └── schema.prisma
+│
 ├── src/
+│   │
 │   ├── config/
-│   │   └── env.ts           # Zod-validated environment variables
+│   │   ├── env.ts
+│   │   └── constants.ts
+│   │
 │   ├── lib/
-│   │   └── prisma.ts        # Prisma client singleton
+│   │   ├── prisma.ts
+│   │   └── redis.ts
+│   │
 │   ├── routes/
-│   │   └── health.routes.ts
-│   ├── app.ts               # Express app factory
-│   └── server.ts            # Entry point + graceful shutdown
+│   │
+│   ├── controllers/
+│   │
+│   ├── services/
+│   │
+│   ├── repositories/
+│   │
+│   ├── middleware/
+│   │
+│   ├── validators/
+│   │
+│   ├── utils/
+│   │
+│   ├── types/
+│   │
+│   ├── app.ts
+│   └── server.ts
+│
+├── docs/
+├── docker/
 ├── .env.example
-├── .gitignore
-├── tsconfig.json
+├── Dockerfile
+├── docker-compose.yml
 ├── package.json
 └── README.md
 ```
 
-> Structure grows as phases are completed — `controllers/`, `middleware/`, `services/`, and `utils/` folders are added from Phase 2 onwards.
+---
+
+# 🧠 Architecture Principles
+
+AuthForge follows a layered architecture.
+
+```text
+Routes
+  │
+Controllers
+  │
+Services
+  │
+Repositories
+  │
+Database
+```
+
+### Routes
+
+Responsible only for endpoint definitions and middleware composition.
+
+### Controllers
+
+Handle HTTP concerns and response formatting.
+
+### Services
+
+Contain business logic.
+
+### Repositories
+
+Abstract database access and persistence operations.
+
+### Infrastructure Layer
+
+Handles:
+
+- PostgreSQL
+- Redis
+- SMTP
+- OAuth Providers
+- Logging
+- Configuration
 
 ---
 
-## Getting Started
+# 🔐 Security Features
 
-### Prerequisites
+## Password Security
 
-- Node.js v18+
-- PostgreSQL 16 (or Docker)
-- Redis 7+ (added in Phase 3, or Docker)
+Passwords are hashed using bcrypt before storage.
 
-The quickest local setup uses Docker — no Postgres or Redis install needed:
-
-```bash
-# PostgreSQL
-docker run --name authforge-db \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=authforge \
-  -p 5432:5432 -d postgres:16
-
-# Redis (Phase 3 onwards)
-docker run --name authforge-redis \
-  -p 6379:6379 -d redis:7-alpine
-```
-
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/ali0786mehdi/authforge.git
-cd authforge
-
-# 2. Install dependencies
-npm install
-
-# 3. Copy environment file and fill in your values
-cp .env.example .env
-
-# 4. Run database migrations
-npx prisma migrate dev
-
-# 5. Start the development server
-npm run dev
-```
-
-### Environment Variables
-
-Copy `.env.example` to `.env`. Variables are validated at startup — the server will crash immediately with a clear error if any required variable is missing.
-
-**Phase 1 (current)**
-
-```env
-NODE_ENV=development
-PORT=5000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/authforge?schema=public"
-```
-
-**Added in later phases**
-
-```env
-# Phase 2 — JWT
-JWT_ACCESS_SECRET=
-JWT_REFRESH_SECRET=
-JWT_ACCESS_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-# Phase 3 — Redis
-REDIS_URL=redis://localhost:6379
-
-# Phase 4 — Email
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=
-
-# Phase 5 — OAuth2
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_CALLBACK_URL=
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-GITHUB_CALLBACK_URL=
-
-# Phase 6 — App URL (for CORS lock-down)
-CLIENT_URL=http://localhost:3000
-```
-
-### Available Scripts
-
-```bash
-npm run dev          # Start dev server with hot reload (tsx watch)
-npm run build        # Compile TypeScript to dist/
-npm run start        # Run compiled output (production)
-npm run prisma:studio # Open Prisma Studio (visual DB browser)
+```text
+Password
+   ↓
+bcrypt
+   ↓
+Database
 ```
 
 ---
 
-## API Reference
+## JWT Authentication
 
-### Health
+AuthForge uses:
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/health` | None | Server + database status |
+- Access Tokens
+- Refresh Tokens
 
-**Response `200 OK`**
+```text
+Login
+  ↓
+Access Token (Short-lived)
+Refresh Token (Long-lived)
+```
+
+---
+
+## Refresh Token Rotation
+
+Every refresh operation issues:
+
+- New Access Token
+- New Refresh Token
+
+and invalidates the previous refresh token.
+
+This helps mitigate token replay attacks.
+
+---
+
+## Session Revocation
+
+Redis stores active sessions and revoked tokens.
+
+```text
+Logout
+  ↓
+Token Revoked
+  ↓
+Redis
+  ↓
+Future Requests Rejected
+```
+
+---
+
+## Rate Limiting
+
+Planned protection against:
+
+- Credential stuffing
+- Brute-force attacks
+- API abuse
+
+---
+
+## Multi-Factor Authentication
+
+Planned support:
+
+- TOTP
+- Google Authenticator
+- Authenticator Apps
+
+---
+
+# 🚀 Features
+
+## Phase 1 — Foundation
+
+- [x] Express Setup
+- [x] TypeScript Configuration
+- [x] PostgreSQL Integration
+- [x] Prisma ORM
+- [x] Environment Validation
+- [x] Health Check Endpoint
+- [x] Graceful Shutdown
+
+---
+
+## Phase 2 — Core Authentication
+
+- [ ] User Registration
+- [ ] User Login
+- [ ] Password Hashing
+- [ ] JWT Access Tokens
+- [ ] Refresh Tokens
+- [ ] Logout
+- [ ] Current User Endpoint
+
+---
+
+## Phase 3 — Security & Sessions
+
+- [ ] Redis Integration
+- [ ] Session Management
+- [ ] Token Blacklisting
+- [ ] Refresh Token Rotation
+- [ ] Refresh Token Reuse Detection
+- [ ] Rate Limiting
+- [ ] RBAC
+
+---
+
+## Phase 4 — Account Lifecycle
+
+- [ ] Email Verification
+- [ ] Password Reset
+- [ ] Change Password
+- [ ] TOTP-Based MFA
+- [ ] Audit Logging
+
+---
+
+## Phase 5 — Social Authentication
+
+- [ ] Google OAuth2
+- [ ] GitHub OAuth2
+- [ ] Multi-Device Sessions
+- [ ] Session Dashboard
+
+---
+
+## Phase 6 — Production Readiness
+
+- [ ] Swagger Documentation
+- [ ] Dockerfile
+- [ ] Docker Compose
+- [ ] Structured Logging
+- [ ] Health Monitoring
+- [ ] CI/CD Pipeline
+
+---
+
+# 📖 API Reference
+
+## Health
+
+### GET /api/health
+
+Response
+
 ```json
 {
   "status": "ok",
   "database": "connected",
-  "timestamp": "2026-06-14T12:00:00.000Z"
+  "timestamp": "2026-06-20T12:00:00.000Z"
 }
 ```
 
-**Response `503 Service Unavailable`** *(database unreachable)*
-```json
-{
-  "status": "error",
-  "database": "disconnected",
-  "timestamp": "2026-06-14T12:00:00.000Z"
-}
+---
+
+## Authentication (Phase 2)
+
+```http
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+POST /api/v1/auth/refresh
+GET  /api/v1/auth/me
 ```
 
-### Auth — Phase 2
+---
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/v1/auth/register` | None | Register a new user |
-| `POST` | `/api/v1/auth/login` | None | Login, returns token pair |
-| `POST` | `/api/v1/auth/logout` | Bearer | Revoke refresh token |
-| `POST` | `/api/v1/auth/refresh` | Cookie | Issue new access token |
-| `GET` | `/api/v1/auth/me` | Bearer | Get current user profile |
+## Authorization (Phase 3)
 
-### 2FA, OAuth2, Sessions — Phases 3–5
-
-Full API reference available at `/api/docs` once Phase 6 (Swagger) is complete.
+```http
+GET /api/v1/admin/users
+GET /api/v1/admin/sessions
+```
 
 ---
 
-## Roadmap
+# 🛠 Local Development
 
-- [x] Phase 1 — Foundation (Express, TypeScript, PostgreSQL, Prisma, health check)
-- [ ] Phase 2 — Core auth (register, login, JWT access + refresh token rotation)
-- [ ] Phase 3 — Sessions & security (Redis, rate limiting, RBAC, token blacklisting)
-- [ ] Phase 4 — Account lifecycle (email verification, password reset, 2FA/TOTP)
-- [ ] Phase 5 — Social login (Google + GitHub OAuth2, multi-device session management)
-- [ ] Phase 6 — Docs & containers (Swagger/OpenAPI, Dockerfile, docker-compose)
+## Clone Repository
+
+```bash
+git clone https://github.com/ali0786mehdi/authforge.git
+
+cd authforge
+```
 
 ---
 
-## License
+## Install Dependencies
 
-MIT © [Ali Mehdi Mirza](https://github.com/ali0786mehdi)
+```bash
+npm install
+```
+
+---
+
+## Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## Run PostgreSQL
+
+```bash
+docker run \
+--name authforge-db \
+-e POSTGRES_PASSWORD=postgres \
+-e POSTGRES_DB=authforge \
+-p 5432:5432 \
+-d postgres:16
+```
+
+---
+
+## Run Redis
+
+```bash
+docker run \
+--name authforge-redis \
+-p 6379:6379 \
+-d redis:7-alpine
+```
+
+---
+
+## Run Migrations
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+## Start Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# 🌍 Environment Variables
+
+```env
+NODE_ENV=development
+
+PORT=5000
+
+DATABASE_URL=
+
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+REDIS_URL=
+
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+CLIENT_URL=
+```
+
+---
+
+# 📈 Future Enhancements
+
+- SAML Authentication
+- Organization Workspaces
+- Fine-Grained Permissions
+- Audit Dashboard
+- API Keys
+- Device Trust Management
+- Queue-Based Email Delivery
+- Redis Clustering
+- Read Replicas
+- Distributed Tracing
+
+---
+
+# 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome.
+
+Feel free to fork the repository and submit a pull request.
+
+---
+
+# 📄 License
+
+MIT License
+
+---
+
+# 👨‍💻 Author
+
+**Ali Mehdi Mirza**
+
+Backend Engineering Portfolio Project
+
+Building production-grade backend systems with Node.js, TypeScript, PostgreSQL, Prisma, Redis, and modern authentication architecture.
