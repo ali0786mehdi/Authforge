@@ -1,362 +1,215 @@
-# 🛡️ AuthForge
+# 🔐 AuthForge
 
-> Enterprise-Grade Authentication & Authorization Service built with Node.js, TypeScript, PostgreSQL, Prisma, and Redis.
+<div align="center">
 
-AuthForge is a production-oriented identity platform designed to handle authentication, authorization, session management, and account security for modern web applications.
+### Enterprise-Grade Authentication & Authorization Service
 
-Instead of rebuilding authentication logic inside every project, AuthForge acts as a standalone authentication service responsible for user identity, access control, session lifecycle management, and security enforcement.
+A production-ready authentication platform built with **TypeScript**, **Express**, **PostgreSQL**, **Prisma**, and **Redis**. AuthForge centralizes identity management, session handling, authorization, and security best practices into a standalone microservice that can be integrated into any application.
 
-The project is being developed as a backend engineering portfolio project focused on real-world architecture, security practices, scalability considerations, and production readiness.
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript)
+![Node](https://img.shields.io/badge/Node.js-20+-green?style=for-the-badge&logo=node.js)
+![Express](https://img.shields.io/badge/Express.js-Backend-black?style=for-the-badge&logo=express)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?style=for-the-badge&logo=postgresql)
+![Redis](https://img.shields.io/badge/Redis-Cache-red?style=for-the-badge&logo=redis)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
 
----
+[Documentation](#documentation) •
+[Architecture](#architecture) •
+[Installation](#installation) •
+[API](#api-overview)
 
-## ✨ Goals
-
-AuthForge aims to demonstrate:
-
-- Secure authentication architecture
-- JWT access and refresh token lifecycle management
-- Session management using Redis
-- Role-Based Access Control (RBAC)
-- Multi-Factor Authentication (MFA)
-- OAuth2 Social Authentication
-- Secure password recovery flows
-- Production-grade API design
-- Dockerized deployment
-- OpenAPI documentation
-- Scalable backend architecture
+</div>
 
 ---
 
-# 🏗 System Architecture
+# 📖 Overview
 
-```text
-                     ┌──────────────────┐
-                     │  Client Apps     │
-                     │ Web / Mobile     │
-                     └────────┬─────────┘
-                              │
-                              ▼
+AuthForge is a standalone authentication and authorization service designed for modern distributed applications.
 
-                 ┌─────────────────────────┐
-                 │      Express API        │
-                 │ Authentication Service  │
-                 └─────────┬───────────────┘
-                           │
-       ┌───────────────────┼───────────────────┐
-       ▼                   ▼                   ▼
+Instead of implementing authentication logic inside every project, AuthForge provides a centralized identity platform responsible for:
 
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-│ PostgreSQL   │   │ Redis Cache  │   │ OAuth/Email │
-│ User Data    │   │ Sessions     │   │ Providers   │
-└──────────────┘   └──────────────┘   └──────────────┘
-```
+- User Authentication
+- Authorization
+- Session Management
+- JWT Token Lifecycle
+- Refresh Token Rotation
+- Password Security
+- Role-Based Access Control
+- Secure API Access
+
+Its stateless architecture makes it suitable for monoliths, microservices, SaaS platforms, and enterprise applications.
 
 ---
 
-# ⚙️ Tech Stack
+# ✨ Features
 
-| Layer | Technology |
-|---------|------------|
-| Runtime | Node.js 20+ |
-| Language | TypeScript |
+- 🔐 JWT Authentication
+- 🔄 Refresh Token Rotation
+- 🚫 Session Revocation
+- 🔑 Secure Password Hashing (bcrypt)
+- 👥 Role-Based Authorization (RBAC)
+- 📦 Modular Service-Repository Architecture
+- ⚡ Redis Session Management
+- 🛡 Zod Request Validation
+- 📄 Structured Logging with Pino
+- 🐳 Docker & Docker Compose Support
+- 🧪 Production-Ready Code Structure
+- 📈 Scalable Stateless API
+
+---
+
+# 🏗 Engineering Highlights
+
+## Security First
+
+- JWT Access & Refresh Tokens
+- Refresh Token Rotation
+- bcrypt Password Hashing
+- Secure HTTP-only Cookies
+- Redis Token Blacklisting
+- Zod Input Validation
+
+---
+
+## Scalability
+
+- Stateless REST API
+- Redis-backed Session Store
+- Horizontal Scaling Ready
+- Layered Architecture
+- Independent Authentication Service
+
+---
+
+## Maintainability
+
+- Service Layer
+- Repository Pattern
+- Strict TypeScript
+- Prisma ORM
+- Modular Folder Structure
+- Easy Testing
+
+---
+
+# 🛠 Tech Stack
+
+| Category | Technology |
+|-----------|------------|
+| Language | TypeScript (Strict Mode) |
+| Runtime | Node.js v20+ |
 | Framework | Express.js |
 | Database | PostgreSQL |
 | ORM | Prisma |
 | Cache | Redis |
-| Authentication | JWT |
 | Validation | Zod |
+| Authentication | JWT |
 | Password Hashing | bcrypt |
-| API Documentation | Swagger/OpenAPI |
+| Logging | Pino |
 | Containerization | Docker |
-| Background Jobs | BullMQ *(planned)* |
-| Logging | Pino *(planned)* |
+| Package Manager | npm |
+
+---
+
+# 🏛 Architecture
+
+```mermaid
+graph TD
+
+A[Client Application] --> B[AuthForge API]
+
+B --> C[Controllers]
+
+C --> D[Service Layer]
+
+D --> E[Repository Layer]
+
+E --> F[(PostgreSQL)]
+
+D --> G[(Redis)]
+
+D --> H[JWT Service]
+
+D --> I[Email/OAuth Providers]
+```
 
 ---
 
 # 📂 Project Structure
 
-```text
-authforge/
-
+```
+src/
+│
+├── controllers/
+├── services/
+├── repositories/
+├── routes/
+├── middleware/
+├── validators/
+├── config/
+├── utils/
 ├── prisma/
-│   ├── migrations/
-│   └── schema.prisma
-│
-├── src/
-│   │
-│   ├── config/
-│   │   ├── env.ts
-│   │   └── constants.ts
-│   │
-│   ├── lib/
-│   │   ├── prisma.ts
-│   │   └── redis.ts
-│   │
-│   ├── routes/
-│   │
-│   ├── controllers/
-│   │
-│   ├── services/
-│   │
-│   ├── repositories/
-│   │
-│   ├── middleware/
-│   │
-│   ├── validators/
-│   │
-│   ├── utils/
-│   │
-│   ├── types/
-│   │
-│   ├── app.ts
-│   └── server.ts
-│
-├── docs/
-├── docker/
-├── .env.example
-├── Dockerfile
-├── docker-compose.yml
-├── package.json
-└── README.md
+├── types/
+└── app.ts
 ```
 
 ---
 
-# 🧠 Architecture Principles
-
-AuthForge follows a layered architecture.
-
-```text
-Routes
-  │
-Controllers
-  │
-Services
-  │
-Repositories
-  │
-Database
-```
-
-### Routes
-
-Responsible only for endpoint definitions and middleware composition.
-
-### Controllers
-
-Handle HTTP concerns and response formatting.
-
-### Services
-
-Contain business logic.
-
-### Repositories
-
-Abstract database access and persistence operations.
-
-### Infrastructure Layer
-
-Handles:
-
-- PostgreSQL
-- Redis
-- SMTP
-- OAuth Providers
-- Logging
-- Configuration
-
----
-
-# 🔐 Security Features
-
-## Password Security
-
-Passwords are hashed using bcrypt before storage.
-
-```text
-Password
-   ↓
-bcrypt
-   ↓
-Database
-```
-
----
+# 🔐 Security Principles
 
 ## JWT Authentication
 
-AuthForge uses:
-
-- Access Tokens
-- Refresh Tokens
-
-```text
-Login
-  ↓
-Access Token (Short-lived)
-Refresh Token (Long-lived)
-```
+Short-lived Access Tokens are used for API authorization.
 
 ---
 
 ## Refresh Token Rotation
 
-Every refresh operation issues:
+Every refresh request:
 
-- New Access Token
-- New Refresh Token
+- Invalidates the previous refresh token
+- Issues a new refresh token
+- Prevents replay attacks
 
-and invalidates the previous refresh token.
+---
 
-This helps mitigate token replay attacks.
+## Password Protection
+
+Passwords are secured using:
+
+- bcrypt
+- Salted Hashing
+- Configurable Cost Factor
 
 ---
 
 ## Session Revocation
 
-Redis stores active sessions and revoked tokens.
+Redis stores revoked sessions and invalidated refresh tokens, enabling:
 
-```text
-Logout
-  ↓
-Token Revoked
-  ↓
-Redis
-  ↓
-Future Requests Rejected
-```
+- Instant Logout
+- Session Expiration
+- Multi-device Session Control
 
 ---
 
-## Rate Limiting
+## Input Validation
 
-Planned protection against:
-
-- Credential stuffing
-- Brute-force attacks
-- API abuse
+Every request is validated using Zod schemas before reaching the business logic layer.
 
 ---
 
-## Multi-Factor Authentication
+# 🚀 Installation
 
-Planned support:
+## Prerequisites
 
-- TOTP
-- Google Authenticator
-- Authenticator Apps
-
----
-
-# 🚀 Features
-
-## Phase 1 — Foundation
-
-- [x] Express Setup
-- [x] TypeScript Configuration
-- [x] PostgreSQL Integration
-- [x] Prisma ORM
-- [x] Environment Validation
-- [x] Health Check Endpoint
-- [x] Graceful Shutdown
+- Node.js v20+
+- Docker
+- Docker Compose
+- PostgreSQL
+- Redis
 
 ---
-
-## Phase 2 — Core Authentication
-
-- [ ] User Registration
-- [ ] User Login
-- [ ] Password Hashing
-- [ ] JWT Access Tokens
-- [ ] Refresh Tokens
-- [ ] Logout
-- [ ] Current User Endpoint
-
----
-
-## Phase 3 — Security & Sessions
-
-- [ ] Redis Integration
-- [ ] Session Management
-- [ ] Token Blacklisting
-- [ ] Refresh Token Rotation
-- [ ] Refresh Token Reuse Detection
-- [ ] Rate Limiting
-- [ ] RBAC
-
----
-
-## Phase 4 — Account Lifecycle
-
-- [ ] Email Verification
-- [ ] Password Reset
-- [ ] Change Password
-- [ ] TOTP-Based MFA
-- [ ] Audit Logging
-
----
-
-## Phase 5 — Social Authentication
-
-- [ ] Google OAuth2
-- [ ] GitHub OAuth2
-- [ ] Multi-Device Sessions
-- [ ] Session Dashboard
-
----
-
-## Phase 6 — Production Readiness
-
-- [ ] Swagger Documentation
-- [ ] Dockerfile
-- [ ] Docker Compose
-- [ ] Structured Logging
-- [ ] Health Monitoring
-- [ ] CI/CD Pipeline
-
----
-
-# 📖 API Reference
-
-## Health
-
-### GET /api/health
-
-Response
-
-```json
-{
-  "status": "ok",
-  "database": "connected",
-  "timestamp": "2026-06-20T12:00:00.000Z"
-}
-```
-
----
-
-## Authentication (Phase 2)
-
-```http
-POST /api/v1/auth/register
-POST /api/v1/auth/login
-POST /api/v1/auth/logout
-POST /api/v1/auth/refresh
-GET  /api/v1/auth/me
-```
-
----
-
-## Authorization (Phase 3)
-
-```http
-GET /api/v1/admin/users
-GET /api/v1/admin/sessions
-```
-
----
-
-# 🛠 Local Development
 
 ## Clone Repository
 
@@ -378,40 +231,44 @@ npm install
 
 ## Configure Environment
 
-```bash
-cp .env.example .env
+Create a `.env` file.
+
+Example:
+
+```env
+DATABASE_URL=
+
+REDIS_URL=
+
+JWT_SECRET=
+
+JWT_REFRESH_SECRET=
+
+PORT=5000
 ```
 
 ---
 
-## Run PostgreSQL
+## Start Infrastructure
 
 ```bash
-docker run \
---name authforge-db \
--e POSTGRES_PASSWORD=postgres \
--e POSTGRES_DB=authforge \
--p 5432:5432 \
--d postgres:16
+docker-compose up -d
 ```
 
 ---
 
-## Run Redis
-
-```bash
-docker run \
---name authforge-redis \
--p 6379:6379 \
--d redis:7-alpine
-```
-
----
-
-## Run Migrations
+## Run Database Migrations
 
 ```bash
 npx prisma migrate dev
+```
+
+---
+
+## Generate Prisma Client
+
+```bash
+npx prisma generate
 ```
 
 ---
@@ -424,72 +281,97 @@ npm run dev
 
 ---
 
-# 🌍 Environment Variables
+# 📌 API Overview
 
-```env
-NODE_ENV=development
-
-PORT=5000
-
-DATABASE_URL=
-
-JWT_ACCESS_SECRET=
-JWT_REFRESH_SECRET=
-
-JWT_ACCESS_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-REDIS_URL=
-
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
-
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-
-CLIENT_URL=
-```
+| Method | Endpoint | Description |
+|----------|----------------|----------------------------|
+| POST | /auth/register | Register User |
+| POST | /auth/login | Login |
+| POST | /auth/logout | Logout |
+| POST | /auth/refresh | Refresh Access Token |
+| GET | /auth/profile | Get Current User |
+| PATCH | /auth/profile | Update Profile |
+| PATCH | /auth/password | Change Password |
+| DELETE | /auth/account | Delete Account |
 
 ---
 
-# 📈 Future Enhancements
+# ⚙ Environment Variables
 
-- SAML Authentication
-- Organization Workspaces
-- Fine-Grained Permissions
-- Audit Dashboard
-- API Keys
-- Device Trust Management
-- Queue-Based Email Delivery
-- Redis Clustering
-- Read Replicas
-- Distributed Tracing
+| Variable | Description |
+|-----------|------------|
+| DATABASE_URL | PostgreSQL Connection |
+| REDIS_URL | Redis Connection |
+| JWT_SECRET | Access Token Secret |
+| JWT_REFRESH_SECRET | Refresh Token Secret |
+| PORT | Server Port |
+
+---
+
+# 📊 Design Goals
+
+- High Security
+- High Availability
+- Scalability
+- Clean Architecture
+- Maintainability
+- Separation of Concerns
+- Production Readiness
+
+---
+
+# 🚧 Roadmap
+
+- [ ] OAuth (Google)
+- [ ] GitHub OAuth
+- [ ] Email Verification
+- [ ] Password Reset
+- [ ] Multi-Factor Authentication
+- [ ] Rate Limiting
+- [ ] Audit Logs
+- [ ] API Documentation (Swagger)
+- [ ] WebAuthn / Passkeys
+- [ ] Kubernetes Deployment
 
 ---
 
 # 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome.
+Contributions are welcome!
 
-Feel free to fork the repository and submit a pull request.
+1. Fork the repository
+2. Create your feature branch
+
+```bash
+git checkout -b feature/my-feature
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add new feature"
+```
+
+4. Push to your branch
+
+```bash
+git push origin feature/my-feature
+```
+
+5. Open a Pull Request
 
 ---
 
-# 📄 License
+# 📜 License
 
-MIT License
+This project is licensed under the **MIT License**.
 
 ---
 
-# 👨‍💻 Author
+<div align="center">
 
-**Ali Mehdi Mirza**
+### ⭐ If you find this project useful, consider giving it a star!
 
-Backend Engineering Portfolio Project
+Made with ❤️ using TypeScript, Express, PostgreSQL, Prisma & Redis
 
-Building production-grade backend systems with Node.js, TypeScript, PostgreSQL, Prisma, Redis, and modern authentication architecture.
+</div>
