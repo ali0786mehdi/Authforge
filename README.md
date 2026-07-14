@@ -322,12 +322,12 @@ npm run dev
 
 # 🚧 Roadmap
 
-- [ ] OAuth (Google)
-- [ ] GitHub OAuth
-- [ ] Email Verification
-- [ ] Password Reset
-- [ ] Multi-Factor Authentication
-- [ ] Rate Limiting
+- [x] OAuth (Google)
+- [x] GitHub OAuth
+- [x] Email Verification
+- [x] Password Reset
+- [x] Multi-Factor Authentication
+- [x] Rate Limiting
 - [ ] Audit Logs
 - [ ] API Documentation (Swagger)
 - [ ] WebAuthn / Passkeys
