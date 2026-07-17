@@ -45,13 +45,13 @@ export default function LoginPage() {
     try {
       if (mfaRequired) {
         // Step 2: MFA Verification
-        const response = await api.post("/mfa/login", { mfaToken, code: mfaCode })
+        const response = await api.post("/auth/mfa/login", { mfaToken, code: mfaCode })
         const { accessToken } = response.data.data
         localStorage.setItem("accessToken", accessToken)
         router.push("/dashboard")
       } else {
         // Step 1: Initial Login
-        const response = await api.post("/login", { email, password })
+        const response = await api.post("/auth/login", { email, password })
         const data = response.data.data
 
         if (data.mfaRequired) {
@@ -152,7 +152,7 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="password">Password</Label>
-                        <Link href="#" className="text-xs text-primary hover:underline">
+                        <Link href="/forgot-password" className="text-xs text-primary hover:underline">
                           Forgot password?
                         </Link>
                       </div>

@@ -284,7 +284,7 @@ npm run dev
 # 📌 API Overview
 
 | Method | Endpoint | Description |
-|----------|----------------|----------------------------|
+|----------|-------------------------|----------------------------|
 | POST | /auth/register | Register User |
 | POST | /auth/login | Login |
 | POST | /auth/logout | Logout |
@@ -293,6 +293,19 @@ npm run dev
 | PATCH | /auth/profile | Update Profile |
 | PATCH | /auth/password | Change Password |
 | DELETE | /auth/account | Delete Account |
+| POST | /auth/verify-email | Verify Email Token |
+| POST | /auth/resend-verification | Resend Verification Email |
+| POST | /auth/forgot-password | Request Password Reset |
+| POST | /auth/reset-password | Reset Password with Token |
+| POST | /auth/mfa/setup | Initiate MFA Setup |
+| POST | /auth/mfa/verify-setup | Verify MFA Setup Code |
+| POST | /auth/mfa/login | MFA Login (TOTP) |
+| GET | /auth/oauth/google | Initiate Google OAuth |
+| GET | /auth/oauth/github | Initiate GitHub OAuth |
+| POST | /orgs | Create Organization |
+| GET | /orgs | List User Organizations |
+| GET | /orgs/:id/members | Get Organization Members |
+| POST | /orgs/:id/members | Add Organization Member |
 
 ---
 

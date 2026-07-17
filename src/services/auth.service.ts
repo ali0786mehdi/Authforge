@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from '../utils/hash';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken, generateMfaToken, verifyMfaToken } from '../utils/jwt';
 import { ApiError } from '../utils/ApiError';
 import { redis } from '../utils/redis';
+import { emailVerificationService } from './email-verification.service';
 import crypto from 'crypto';
 import authenticator from 'otplib'; // otplib might import differently depending on default export
 
@@ -20,6 +21,11 @@ export class AuthService {
       passwordHash,
       firstName: data.firstName,
       lastName: data.lastName,
+    });
+
+    // Send verification email (non-blocking — don't fail registration if email fails)
+    emailVerificationService.sendVerification(user.id).catch((err) => {
+      console.error('Failed to send verification email:', err);
     });
 
     return {

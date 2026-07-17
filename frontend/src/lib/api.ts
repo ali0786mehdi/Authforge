@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance configured to talk to the Backend
 export const api = axios.create({
-  baseURL: 'http://localhost:5000/auth',
+  baseURL: 'http://localhost:5000',
   withCredentials: true, // IMPORTANT: Allows sending and receiving HttpOnly cookies (refresh token)
   headers: {
     'Content-Type': 'application/json',
@@ -59,3 +59,4 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+

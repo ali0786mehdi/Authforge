@@ -22,6 +22,8 @@ model User {
   sessions        Session[]
   identities      OAuthIdentity[]
   organizations   OrganizationMember[]
+  verificationTokens VerificationToken[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 enum Role {
@@ -76,4 +78,25 @@ model Session {
   createdAt         DateTime @default(now())
   
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

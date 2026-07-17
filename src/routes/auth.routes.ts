@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import { validateRequest } from '../middleware/validate.middleware';
 import { authenticate } from '../middleware/auth.middleware';
+import { authLimiter } from '../middleware/rateLimit.middleware';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
   registerSchema,
@@ -12,9 +13,9 @@ import {
 
 const router = Router();
 
-// Public Routes
-router.post('/register', validateRequest(registerSchema), asyncHandler(authController.register));
-router.post('/login', validateRequest(loginSchema), asyncHandler(authController.login));
+// Public Routes (with rate limiting)
+router.post('/register', authLimiter, validateRequest(registerSchema), asyncHandler(authController.register));
+router.post('/login', authLimiter, validateRequest(loginSchema), asyncHandler(authController.login));
 router.post('/refresh', asyncHandler(authController.refresh));
 
 // Protected Routes
@@ -26,3 +27,4 @@ router.patch('/password', validateRequest(changePasswordSchema), asyncHandler(au
 router.delete('/account', asyncHandler(authController.deleteAccount));
 
 export const authRoutes = router;
+
