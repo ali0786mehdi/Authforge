@@ -16,7 +16,19 @@ export class AuthController {
       userAgent: req.headers['user-agent'],
     };
 
-    const { user, accessToken, refreshToken } = await authService.login(req.body, clientInfo);
+    const result = await authService.login(req.body, clientInfo);
+
+    if (result.mfaRequired) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          mfaRequired: true,
+          mfaToken: result.mfaToken,
+        },
+      });
+    }
+
+    const { user, accessToken, refreshToken } = result;
 
     // Set HTTP Only Cookie
     res.cookie('refreshToken', refreshToken, {
