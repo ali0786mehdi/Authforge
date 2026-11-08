@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import cookieParser from 'cookie-parser';
 import { logger } from './utils/logger';
+import { env } from './config/env';
 import { authRoutes } from './routes/auth.routes';
 import { oauthRoutes } from './routes/oauth.routes';
 import { mfaRoutes } from './routes/mfa.routes';
@@ -17,7 +18,7 @@ const app = express();
 
 // Security Middlewares
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 
 // General API Rate Limiter
 app.use(apiLimiter);
@@ -41,4 +42,3 @@ app.use('/orgs', orgRoutes);
 app.use(errorMiddleware);
 
 export default app;
-
