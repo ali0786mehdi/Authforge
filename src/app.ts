@@ -30,12 +30,14 @@ app.use(cookieParser());
 // Logging Middleware
 app.use(pinoHttp({ logger }));
 
-// Routes
-app.use('/auth', authRoutes);
+// Mount specific auth subroutes before authRoutes. authRoutes installs
+// authentication for its remaining /auth paths, so mounting it first would
+// reject public OAuth and MFA login requests before their routers can handle them.
 app.use('/auth/oauth', oauthRoutes);
 app.use('/auth/mfa', mfaRoutes);
 app.use('/auth', emailVerificationRoutes);
 app.use('/auth', passwordResetRoutes);
+app.use('/auth', authRoutes);
 app.use('/orgs', orgRoutes);
 
 // Global Error Handler
