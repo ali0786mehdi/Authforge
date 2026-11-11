@@ -22,22 +22,21 @@ export class OrganizationController {
   }
 
   async getMembers(req: Request, res: Response) {
-    // Requires requireOrganization middleware
     const orgId = req.organization!.id;
     const members = await orgService.getOrganizationMembers(orgId);
     res.status(200).json({ status: 'success', data: members });
   }
 
   async addMember(req: Request, res: Response) {
-    // Requires requireOrganization and requireRole(['OWNER', 'ADMIN'])
     const orgId = req.organization!.id;
+    const actorRole = req.organization!.role;
     const { email, role } = req.body;
 
     if (!email || !role) {
       return res.status(400).json({ status: 'error', message: 'Email and role are required' });
     }
 
-    const result = await orgService.addMember(orgId, email, role);
+    const result = await orgService.addMember(orgId, email, role, actorRole);
     res.status(201).json({ status: 'success', data: result });
   }
 }

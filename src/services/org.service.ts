@@ -37,10 +37,20 @@ export class OrganizationService {
     }));
   }
 
-  async addMember(organizationId: string, email: string, role: Role) {
+  async addMember(organizationId: string, email: string, role: Role, actorRole: Role) {
     const user = await userRepository.findByEmail(email);
     if (!user) {
       throw new ApiError(404, 'User with this email not found. They must register first.');
+    }
+
+    // OWNER can grant OWNER or ADMIN or MEMBER.
+    // ADMIN can only grant MEMBER.
+    if (actorRole === 'ADMIN' && role !== 'MEMBER') {
+      throw new ApiError(403, 'Admins can only assign the MEMBER role.');
+    }
+
+    if (actorRole !== 'OWNER' && role === 'OWNER') {
+      throw new ApiError(403, 'Only the OWNER can assign the OWNER role.');
     }
 
     const existingMember = await orgRepository.getMember(user.id, organizationId);
