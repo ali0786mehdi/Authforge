@@ -3,6 +3,16 @@ import { authService } from '../services/auth.service';
 import { userRepository } from '../repositories/user.repository';
 import { hashPassword, verifyPassword } from '../utils/hash';
 import { ApiError } from '../utils/ApiError';
+import { env } from '../config/env';
+
+const setRefreshCookie = (res: Response, refreshToken: string) => {
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+};
 
 export class AuthController {
   async register(req: Request, res: Response) {
@@ -29,21 +39,19 @@ export class AuthController {
     }
 
     const { user, accessToken, refreshToken } = result;
-
-    // Set HTTP Only Cookie
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    setRefreshCookie(res, refreshToken);
 
     res.status(200).json({ status: 'success', data: { user, accessToken } });
   }
 
   async logout(req: Request, res: Response) {
     const { userId, sessionId } = (req as any).user;
-    const authHeader = req.headers.authorization as string;
+    const authHeader = req.headers.authorization as string | undefined;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new ApiError(401, 'Unauthorized: Missing or invalid token');
+    }
+
     const accessToken = authHeader.split(' ')[1];
 
     await authService.logout(userId, sessionId, accessToken);
@@ -64,13 +72,7 @@ export class AuthController {
     };
 
     const { accessToken, refreshToken: newRefreshToken } = await authService.refresh(refreshToken, clientInfo);
-
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshCookie(res, newRefreshToken);
 
     res.status(200).json({ status: 'success', data: { accessToken } });
   }
@@ -100,6 +102,9 @@ export class AuthController {
 
     const user = await userRepository.findById(userId);
     if (!user) throw new ApiError(404, 'User not found');
+    if (!user.passwordHash) {
+      throw new ApiError(400, 'This account does not use a password. Use OAuth or reset your password flow.');
+    }
 
     const isValid = await verifyPassword(currentPassword, user.passwordHash);
     if (!isValid) throw new ApiError(400, 'Invalid current password');
